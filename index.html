@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You, My Love ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lora:ital,wght@1,600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #fdf5f6;
+            --primary-pink: #fe5d89;
+            --primary-pink-hover: #e54b73;
+            --text-dark: #3a3a3a;
+            --text-light: #888888;
+            --card-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Nunito', sans-serif;
+            color: var(--text-dark);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Ambient Floating Hearts Background */
+        .bg-hearts { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .bg-heart { position: absolute; color: rgba(254, 93, 137, 0.15); font-size: 20px; animation: floatUp 10s linear infinite; bottom: -50px; }
+
+        /* Screens */
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out; padding: 20px; z-index: 10; }
+        .screen.active { opacity: 1; pointer-events: all; }
+
+        /* Typography */
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 800; text-align: center; }
+        h2.serif { font-family: 'Lora', serif; font-style: italic; color: var(--primary-pink); font-size: 1.8rem; margin-bottom: 10px; text-align: center; }
+        p.subtitle { font-size: 1.1rem; color: var(--text-light); margin-bottom: 2rem; font-weight: 600; text-align: center; max-width: 400px; z-index: 5; position: relative;}
+        .handwriting { font-family: 'Caveat', cursive; font-size: 1.8rem; color: var(--primary-pink); }
+
+        /* Buttons */
+        .btn-container { display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; z-index: 20; position: relative;}
+        button { font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 700; border: none; border-radius: 30px; padding: 12px 35px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-primary { background-color: var(--primary-pink); color: white; box-shadow: 0 8px 20px rgba(254, 93, 137, 0.3); }
+        .btn-primary:active { transform: scale(0.95); }
+        .btn-secondary { background-color: white; color: var(--text-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        /* Screen 1: Intro Note */
+        .cute-card { background: var(--card-bg); padding: 40px 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(254, 93, 137, 0.08); text-align: center; border: 2px solid #ffecf0; backdrop-filter: blur(10px); z-index: 10; }
+        .envelope-icon { font-size: 4rem; margin-bottom: 15px; animation: bounce 2s infinite; }
+        #btn-no { position: relative; }
+
+        /* Screen 2: String Lights */
+        .lights-container { position: absolute; top: 0; width: 100%; display: flex; justify-content: space-around; padding: 10px; z-index: 5; }
+        .bulb { width: 15px; height: 25px; background: #e0e0e0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; position: relative; transition: all 1s ease; opacity: 0.2; }
+        .bulb::before { content: ''; position: absolute; top: -25px; left: 50%; width: 2px; height: 25px; background: #555; transform: translateX(-50%); }
+        .lights-on .bulb { opacity: 1; }
+        .lights-on .bulb:nth-child(1) { background: #ff7eb3; box-shadow: 0 0 30px #ff7eb3; }
+        .lights-on .bulb:nth-child(2) { background: #ffdfba; box-shadow: 0 0 30px #ffdfba; }
+        .lights-on .bulb:nth-child(3) { background: #baffc9; box-shadow: 0 0 30px #baffc9; }
+        .lights-on .bulb:nth-child(4) { background: #bae1ff; box-shadow: 0 0 30px #bae1ff; }
+        .lights-on .bulb:nth-child(5) { background: #e8baff; box-shadow: 0 0 30px #e8baff; }
+        .lights-on .bulb:nth-child(6) { background: #ffb3ba; box-shadow: 0 0 30px #ffb3ba; }
+
+        /* Screen 3: The Love Meter */
+        .heart-meter-container { position: relative; width: 120px; height: 120px; margin: 0 auto 30px; }
+        .heart-outline { font-size: 100px; color: #ffe0e6; position: absolute; top: 0; left: 0; line-height: 1; }
+        .heart-fill { font-size: 100px; color: var(--primary-pink); position: absolute; top: 0; left: 0; line-height: 1; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); transition: clip-path 0.1s linear; }
+        .pulse-anim { animation: heartbeat 1s infinite; }
+
+        /* Screen 4: Polaroids */
+        .polaroid-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; perspective: 1000px; z-index: 10;}
+        .polaroid { width: 140px; height: 160px; background: transparent; cursor: pointer; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
+        .polaroid.flipped { transform: rotateY(180deg); }
+        .polaroid-front, .polaroid-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: white; border-radius: 8px; padding: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .polaroid-front { background: #fff; }
+        .polaroid-front .photo-area { width: 100%; height: 100px; background: #ffe4e9; margin-bottom: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+        .polaroid-back { background: #fff; transform: rotateY(180deg); border: 2px solid var(--primary-pink); }
+        
+        /* Screen 5: Flower Bouquet */
+        .bouquet-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .flower-item { position: absolute; font-size: 3rem; cursor: pointer; pointer-events: all; filter: grayscale(80%) opacity(0.6); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); transform: translate(-50%, -50%) scale(0.8); z-index: 15; -webkit-tap-highlight-color: transparent; }
+        .flower-item.gathered { filter: grayscale(0%) opacity(1); }
+        .bouquet-center { position: absolute; top: 50%; left: 50%; width: 120px; height: 120px; transform: translate(-50%, -10%); display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .bouquet-ribbon { position: absolute; bottom: -30px; font-size: 4rem; z-index: 20; opacity: 0; transition: opacity 1s ease 0.5s; }
+        
+        /* Screen 6: Realistic Cake Cut */
+        .cake-wrapper { position: relative; width: 250px; height: 250px; margin: 0 auto 30px auto; touch-action: none; z-index: 10; }
+        .cake-layer { position: absolute; bottom: 0; width: 100%; height: 120px; background: linear-gradient(to bottom, #ff9eb5, #e06c88); border-radius: 10px; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .cake-frosting { position: absolute; bottom: 80px; width: 100%; height: 50px; background: white; border-radius: 20px 20px 10px 10px; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .cake-half { position: absolute; width: 100%; height: 100%; transition: transform 0.8s ease; }
+        .left-half { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+        .right-half { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
+        .cake-cut .left-half { transform: translateX(-35px) rotate(-6deg); }
+        .cake-cut .right-half { transform: translateX(35px) rotate(6deg); }
+        .candle { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 12px; height: 40px; background: #a2d2ff; border-radius: 5px; z-index: 2; }
+        .flame { position: absolute; bottom: 175px; left: 50%; transform: translateX(-50%); width: 16px; height: 25px; background: #ffc300; border-radius: 50% 50% 20% 20%; box-shadow: 0 0 15px #ffc300; animation: flicker 0.5s infinite alternate; transition: opacity 0.3s; }
+        .cake-cut .flame { opacity: 0; }
+        .knife-tool { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 3.5rem; z-index: 20; cursor: grab; touch-action: none; transition: opacity 0.3s ease; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
+        .knife-tool:active { cursor: grabbing; }
+        .cut-line-v { position: absolute; top: 100px; left: 50%; transform: translateX(-50%); width: 3px; height: 0; background: rgba(0,0,0,0.15); z-index: 15; pointer-events: none; border-radius: 5px; }
+
+        /* Finale Elements */
+        .couple-art { font-size: 5rem; margin-bottom: 10px; filter: drop-shadow(0 10px 10px rgba(254, 93, 137, 0.2)); }
+        .sparkle { position: absolute; pointer-events: none; background: var(--primary-pink); border-radius: 50%; animation: pop 1s forwards; z-index: 100;}
+
+        /* Animations */
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes flicker { 0% { transform: translateX(-50%) scale(1); opacity: 0.9; } 100% { transform: translateX(-50%) scale(1.1); opacity: 1; } }
+        @keyframes pop { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+        @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.1); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } 60% { transform: scale(1); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="bg-hearts" id="bg-hearts"></div>
+
+    <div id="screen-1" class="screen active">
+        <div class="cute-card">
+            <div class="envelope-icon">💌</div>
+            <h2 class="serif">A little note for you</h2>
+            <h1>Ready to open it?</h1>
+            <p class="subtitle" style="margin: 10px auto 20px;">I made this just for you.</p>
+            <div class="btn-container">
+                <button class="btn-primary" onclick="startMusic(); nextScreen(2)">Yes!</button>
+                <button class="btn-secondary" id="btn-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-2" class="screen">
+        <div class="lights-container" id="lights">
+            <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+            <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+        </div>
+        <div class="cute-card" style="background: transparent; border: none; box-shadow: none;">
+            <h2 class="serif">First things first...</h2>
+            <h1>It's a bit dark in here.</h1>
+            <div style="margin-top: 30px;">
+                <button class="btn-primary" onclick="turnOnLights()">Set the mood ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-3" class="screen">
+        <div class="cute-card">
+            <h2 class="serif">Measuring my love...</h2>
+            <p class="subtitle">Press and hold the button below to see how much I love you.</p>
+            <div class="heart-meter-container pulse-anim">
+                <div class="heart-outline">❤</div>
+                <div class="heart-fill" id="heart-fill">❤</div>
+            </div>
+            <button class="btn-primary" id="btn-hold">Hold Me</button>
+        </div>
+    </div>
+
+    <div id="screen-4" class="screen">
+        <h2 class="serif" style="position: relative; z-index: 20;">A few things I adore...</h2>
+        <p class="subtitle">Tap on each picture to flip it over.</p>
+        <div class="polaroid-grid">
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-front"><div class="photo-area">🌸</div><span class="handwriting">Memory 1</span></div>
+                <div class="polaroid-back"><span class="handwriting">Your breathtaking smile.</span></div>
+            </div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-front"><div class="photo-area">✨</div><span class="handwriting">Memory 2</span></div>
+                <div class="polaroid-back"><span class="handwriting">How safe I feel with you.</span></div>
+            </div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-front"><div class="photo-area">🥂</div><span class="handwriting">Memory 3</span></div>
+                <div class="polaroid-back"><span class="handwriting">Doing absolutely nothing together.</span></div>
+            </div>
+        </div>
+        <button class="btn-primary" id="btn-polaroid-next" style="opacity: 0; pointer-events: none;" onclick="nextScreen(5)">Next ❤️</button>
+    </div>
+
+    <div id="screen-5" class="screen">
+        <h2 class="serif" style="margin-top: -150px;">Just for you...</h2>
+        <p class="subtitle">Tap the scattered flowers to gather a bouquet.</p>
+        <div class="bouquet-area" id="flower-container">
+            <div class="bouquet-center" id="bouquet-center"><div class="bouquet-ribbon" id="bouquet-ribbon">🎀</div></div>
+        </div>
+        <button class="btn-primary" id="btn-flower-next" style="opacity: 0; pointer-events: none; margin-top: 200px;" onclick="nextScreen(6)">Beautiful ❤️</button>
+    </div>
+
+    <div id="screen-6" class="screen">
+        <h2 class="serif">Cake Time!</h2>
+        <p class="subtitle">Grab the knife and drag it <strong>down</strong> to cut your cake.</p>
+        <div class="cake-wrapper" id="cake-area">
+            <div class="cake-half left-half"><div class="cake-layer"></div><div class="cake-frosting"></div></div>
+            <div class="cake-half right-half"><div class="cake-layer"></div><div class="cake-frosting"></div></div>
+            <div class="candle"></div><div class="flame"></div>
+            <div class="cut-line-v" id="cut-line-v"></div>
+            <div class="knife-tool" id="knife-tool">🔪</div>
+        </div>
+    </div>
+
+    <div id="screen-7" class="screen">
+        <div class="cute-card" id="finale-card">
+            <div class="couple-art">👩🏻‍❤️‍👨🏻</div>
+            <h2 class="serif">Cake Time is over, next...</h2>
+            <h1>Ready to make a wish... Together?</h1>
+            <p class="subtitle" style="margin-bottom: 30px;">Choose to wish alone, or as one.</p>
+            <div class="btn-container">
+                <button class="btn-primary" onclick="finish()">Make a wish together!</button>
+                <button class="btn-secondary" onclick="finish()">Make my wish first.</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- MUSIC LOGIC ---
+        function startMusic() {
+            const music = document.getElementById('bg-music');
+            music.volume = 0.5; // Sets volume to 50% so it's romantic, not deafening
+            music.play().catch(error => console.log("Audio failed to play. Make sure the file exists and is named correctly."));
+        }
+
+        // --- Ambient Background ---
+        const bgContainer = document.getElementById('bg-hearts');
+        for (let i = 0; i < 15; i++) {
+            let heart = document.createElement('div');
+            heart.classList.add('bg-heart');
+            heart.innerHTML = ['💖', '✨', '🌸', '🤍'][Math.floor(Math.random() * 4)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            heart.style.animationDelay = Math.random() * 5 + 's';
+            heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            bgContainer.appendChild(heart);
+        }
+
+        // --- Screen Navigation ---
+        function nextScreen(screenNumber) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + screenNumber).classList.add('active');
+        }
+
+        // --- Screen 1: Runaway Button ---
+        const btnNo = document.getElementById('btn-no');
+        btnNo.addEventListener('mouseover', moveButton);
+        btnNo.addEventListener('touchstart', moveButton, {passive: true});
+        function moveButton() {
+            const x = Math.random() * 120 - 60; 
+            const y = Math.random() * 120 - 60;
+            btnNo.style.transform = `translate(${x}px, ${y}px)`;
+        }
+        btnNo.addEventListener('click', function() { this.innerText = "Nice try 😉"; startMusic(); });
+
+        // --- Screen 2: String Lights ---
+        function turnOnLights() {
+            document.getElementById('lights').classList.add('lights-on');
+            document.body.style.backgroundColor = '#fff0f3';
+            setTimeout(() => nextScreen(3), 2500);
+        }
+
+        // --- Screen 3: Love Meter ---
+        const btnHold = document.getElementById('btn-hold');
+        const heartFill = document.getElementById('heart-fill');
+        let fillInterval; let fillAmount = 0;
+        function startFilling(e) {
+            if(e.cancelable) e.preventDefault();
+            btnHold.style.transform = 'scale(0.95)';
+            fillInterval = setInterval(() => {
+                fillAmount += 2;
+                if(fillAmount > 100) fillAmount = 100;
+                let topPercent = 100 - fillAmount;
+                heartFill.style.clipPath = `polygon(0 100%, 100% 100%, 100% ${topPercent}%, 0 ${topPercent}%)`;
+                if (fillAmount >= 100) {
+                    stopFilling();
+                    createBurst(heartFill.getBoundingClientRect());
+                    setTimeout(() => nextScreen(4), 1500);
+                }
+            }, 30);
+        }
+        function stopFilling() {
+            clearInterval(fillInterval);
+            btnHold.style.transform = 'scale(1)';
+            if(fillAmount < 100) {
+                fillInterval = setInterval(() => {
+                    fillAmount -= 3;
+                    if(fillAmount <= 0) { fillAmount = 0; clearInterval(fillInterval); }
+                    let topPercent = 100 - fillAmount;
+                    heartFill.style.clipPath = `polygon(0 100%, 100% 100%, 100% ${topPercent}%, 0 ${topPercent}%)`;
+                }, 30);
+            }
+        }
+        btnHold.addEventListener('mousedown', startFilling); btnHold.addEventListener('mouseup', stopFilling); btnHold.addEventListener('mouseleave', stopFilling);
+        btnHold.addEventListener('touchstart', startFilling, {passive: false}); btnHold.addEventListener('touchend', stopFilling);
+
+        function createBurst(rect) {
+            for(let i=0; i<30; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.innerText = '❤'; sparkle.style.position = 'absolute'; sparkle.style.color = 'var(--primary-pink)';
+                sparkle.style.left = (rect.left + rect.width/2) + 'px'; sparkle.style.top = (rect.top + rect.height/2) + 'px';
+                sparkle.style.fontSize = Math.random()*20+10 + 'px'; sparkle.style.pointerEvents = 'none'; sparkle.style.zIndex = '100';
+                const tx = (Math.random() - 0.5) * 200; const ty = (Math.random() - 0.5) * 200;
+                sparkle.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }], { duration: 1000, easing: 'ease-out', fill: 'forwards' });
+                document.body.appendChild(sparkle); setTimeout(() => sparkle.remove(), 1000);
+            }
+        }
+
+        // --- Screen 4: Magic Polaroids ---
+        let flippedCards = 0;
+        function flipCard(card) {
+            if (!card.classList.contains('flipped')) {
+                card.classList.add('flipped'); flippedCards++;
+                const rect = card.getBoundingClientRect(); createSparkles(rect.left + rect.width/2, rect.top + rect.height/2);
+                if (flippedCards === 3) {
+                    const nextBtn = document.getElementById('btn-polaroid-next');
+                    nextBtn.style.transition = 'opacity 1s'; nextBtn.style.opacity = '1'; nextBtn.style.pointerEvents = 'all';
+                }
+            }
+        }
+
+        // --- Screen 5: Flower Bouquet ---
+        const flowerContainer = document.getElementById('flower-container');
+        const emojis = ['🌷', '🌸', '🌹', '🌻', '🌼', '🪷'];
+        const positions = [{top: '15%', left: '20%'}, {top: '25%', left: '80%'}, {top: '75%', left: '15%'}, {top: '80%', left: '85%'}, {top: '10%', left: '50%'}, {top: '85%', left: '50%'}];
+        let flowersCollected = 0;
+        emojis.forEach((emoji, index) => {
+            let flower = document.createElement('div'); flower.classList.add('flower-item'); flower.innerHTML = emoji;
+            flower.style.top = positions[index].top; flower.style.left = positions[index].left;
+            flower.style.transform = `translate(-50%, -50%) scale(0.8) rotate(${Math.random()*60 - 30}deg)`;
+            flower.addEventListener('click', function() {
+                if(this.classList.contains('gathered')) return;
+                this.classList.add('gathered');
+                this.style.top = '50%'; this.style.left = '50%';
+                this.style.transform = `translate(-50%, -50%) scale(1.2) rotate(${Math.random()*40 - 20}deg)`;
+                createSparkles(window.innerWidth/2, window.innerHeight/2); flowersCollected++;
+                if (flowersCollected === emojis.length) {
+                    setTimeout(() => { document.getElementById('bouquet-ribbon').style.opacity = '1'; document.getElementById('btn-flower-next').style.opacity = '1'; document.getElementById('btn-flower-next').style.pointerEvents = 'all'; }, 800);
+                }
+            });
+            flowerContainer.appendChild(flower);
+        });
+
+        // --- Screen 6: Realistic Vertical Knife Cut ---
+        const knifeTool = document.getElementById('knife-tool');
+        const cutLineV = document.getElementById('cut-line-v');
+        const cakeWrapper = document.getElementById('cake-area');
+        let isCutting = false; let startY = 0; const initialKnifeTop = 20;
+
+        knifeTool.addEventListener('pointerdown', (e) => {
+            isCutting = true; startY = e.clientY; knifeTool.style.cursor = 'grabbing';
+            if(e.cancelable) e.preventDefault();
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isCutting) return;
+            let deltaY = e.clientY - startY;
+            if (deltaY < 0) deltaY = 0; 
+            if (deltaY > 150) deltaY = 150; 
+            
+            knifeTool.style.top = (initialKnifeTop + deltaY) + 'px';
+            cutLineV.style.height = deltaY + 'px';
+
+            if (deltaY >= 130) {
+                isCutting = false;
+                knifeTool.style.opacity = '0'; 
+                cakeWrapper.classList.add('cake-cut'); 
+                createSparkles(e.clientX, e.clientY);
+                setTimeout(() => nextScreen(7), 2500);
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (isCutting) {
+                isCutting = false; knifeTool.style.cursor = 'grab';
+                knifeTool.style.top = initialKnifeTop + 'px'; cutLineV.style.height = '0px';
+            }
+        });
+
+        // --- Utility: Sparkles ---
+        function createSparkles(x, y) {
+            for(let i=0; i<15; i++) {
+                const sparkle = document.createElement('div'); sparkle.classList.add('sparkle');
+                sparkle.style.left = (x + (Math.random()*80 - 40)) + 'px'; sparkle.style.top = (y + (Math.random()*80 - 40)) + 'px';
+                sparkle.style.width = Math.random()*10 + 5 + 'px'; sparkle.style.height = sparkle.style.width;
+                sparkle.style.backgroundColor = ['#fe5d89', '#ff9eb5', '#ffdfba', '#fff'][Math.floor(Math.random()*4)];
+                document.body.appendChild(sparkle); setTimeout(() => sparkle.remove(), 1000);
+            }
+        }
+
+        // --- Screen 7: Finale ---
+        function finish() {
+            const card = document.getElementById('finale-card');
+            card.innerHTML = `
+                <div class="couple-art">💖</div>
+                <h1 style="color: var(--primary-pink)">Happy Birthday, Gorgeous!</h1>
+                <p class="subtitle" style="margin: 20px auto;">I love you more than words can say. Let's make today unforgettable.</p>
+            `;
+            setInterval(() => { createSparkles(Math.random() * window.innerWidth, Math.random() * window.innerHeight); }, 250);
+        }
+    </script>
+</body>
+</html>
